@@ -6,3 +6,7 @@ for lang in en_US; do
 	mv "${sound}" "${SOUNDDIR}/"
 	ln -s "$(basename ${sound})" "${SOUNDDIR}"/"${lang}"
 done
+
+# Put systemd files in /usr/lib, not /lib, so they don't cause a filesystem conflict
+mv %{buildroot}/lib/* %{buildroot}/usr/lib/
+rmdir %{buildroot}/lib
