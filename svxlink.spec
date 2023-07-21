@@ -5,7 +5,7 @@
 #
 Name     : svxlink
 Version  : 19.09.2
-Release  : 4
+Release  : 5
 URL      : https://github.com/sm0svx/svxlink/archive/19.09.2/svxlink-19.09.2.tar.gz
 Source0  : https://github.com/sm0svx/svxlink/archive/19.09.2/svxlink-19.09.2.tar.gz
 Source1  : https://github.com/sm0svx/svxlink-sounds-en_US-heather/releases/download/19.09/svxlink-sounds-en_US-heather-16k-19.09.tar.bz2
@@ -114,7 +114,7 @@ export http_proxy=http://127.0.0.1:9/
 export https_proxy=http://127.0.0.1:9/
 export no_proxy=localhost,127.0.0.1,0.0.0.0
 export LANG=C.UTF-8
-export SOURCE_DATE_EPOCH=1689982526
+export SOURCE_DATE_EPOCH=1689983322
 mkdir -p clr-build
 pushd clr-build
 export GCC_IGNORE_WERROR=1
@@ -131,7 +131,7 @@ make  %{?_smp_mflags}
 popd
 
 %install
-export SOURCE_DATE_EPOCH=1689982526
+export SOURCE_DATE_EPOCH=1689983322
 rm -rf %{buildroot}
 pushd clr-build
 %make_install
@@ -147,16 +147,13 @@ ln -s "$(basename ${sound})" "${SOUNDDIR}"/"${lang}"
 done
 
 # Put systemd files in /usr/lib, not /lib, so they don't cause a filesystem conflict
+mkdir -p %{buildroot}/usr/lib
 mv %{buildroot}/lib/* %{buildroot}/usr/lib/
 rmdir %{buildroot}/lib
 ## install_append end
 
 %files
 %defattr(-,root,root,-)
-/usr/lib/system/remotetrx.service
-/usr/lib/system/svxlink.service
-/usr/lib/system/svxlink_gpio_setup.service
-/usr/lib/system/svxreflector.service
 
 %files bin
 %defattr(-,root,root,-)
@@ -257,6 +254,7 @@ rmdir %{buildroot}/lib
 /usr/bin/svxlink_gpio_down
 /usr/bin/svxlink_gpio_up
 /usr/bin/svxreflector
+/usr/lib/systemd/system/*
 /usr/lib64/svxlink/*.so
 /usr/share/svxlink/*
 /usr/share/svxlink/*/*
