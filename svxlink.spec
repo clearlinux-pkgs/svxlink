@@ -5,7 +5,7 @@
 #
 Name     : svxlink
 Version  : 19.09.2
-Release  : 2
+Release  : 3
 URL      : https://github.com/sm0svx/svxlink/archive/19.09.2/svxlink-19.09.2.tar.gz
 Source0  : https://github.com/sm0svx/svxlink/archive/19.09.2/svxlink-19.09.2.tar.gz
 Source1  : https://github.com/sm0svx/svxlink-sounds-en_US-heather/releases/download/19.09/svxlink-sounds-en_US-heather-16k-19.09.tar.bz2
@@ -36,6 +36,7 @@ BuildRequires : tcl-dev tk-dev
 # Suppress stripping binaries
 %define __strip /bin/true
 %define debug_package %{nil}
+Patch1: 0001-Make-services-EnvironmenFile-optional.patch
 
 %description
 The SvxLink project is a multi purpose voice services system for
@@ -106,13 +107,14 @@ mkdir -p svxlink-sounds-en_US-heather-16k-19.09.tar
 cd svxlink-sounds-en_US-heather-16k-19.09.tar
 tar xf %{_sourcedir}/svxlink-sounds-en_US-heather-16k-19.09.tar.bz2
 cd %{_builddir}/svxlink-19.09.2
+%patch -P 1 -p1
 
 %build
 export http_proxy=http://127.0.0.1:9/
 export https_proxy=http://127.0.0.1:9/
 export no_proxy=localhost,127.0.0.1,0.0.0.0
 export LANG=C.UTF-8
-export SOURCE_DATE_EPOCH=1689977391
+export SOURCE_DATE_EPOCH=1689981683
 mkdir -p clr-build
 pushd clr-build
 export GCC_IGNORE_WERROR=1
@@ -129,7 +131,7 @@ make  %{?_smp_mflags}
 popd
 
 %install
-export SOURCE_DATE_EPOCH=1689977391
+export SOURCE_DATE_EPOCH=1689981683
 rm -rf %{buildroot}
 pushd clr-build
 %make_install

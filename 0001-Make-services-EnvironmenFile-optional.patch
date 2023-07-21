@@ -1,0 +1,55 @@
+From fe838a1babaa1662c64e3895df8533d24a2e0f82 Mon Sep 17 00:00:00 2001
+From: "Brett T. Warden" <brett.t.warden@intel.com>
+Date: Fri, 21 Jul 2023 16:17:43 -0700
+Subject: [PATCH] Make services EnvironmenFile optional
+
+We don't populate /etc/default so for now, make sure that this won't
+prevent services from launching.
+---
+ src/svxlink/systemd/remotetrx.service.in    | 2 +-
+ src/svxlink/systemd/svxlink.service.in      | 2 +-
+ src/svxlink/systemd/svxreflector.service.in | 2 +-
+ 3 files changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/src/svxlink/systemd/remotetrx.service.in b/src/svxlink/systemd/remotetrx.service.in
+index 2dbd3267a502..9b958a1e6d71 100644
+--- a/src/svxlink/systemd/remotetrx.service.in
++++ b/src/svxlink/systemd/remotetrx.service.in
+@@ -24,7 +24,7 @@ After=network.target remote-fs.target syslog.target time.target
+ After=svxlink_gpio_setup.service
+ 
+ [Service]
+-EnvironmentFile=@SYSTEMD_DEFAULTS_FILES_DIR@/remotetrx
++EnvironmentFile=-@SYSTEMD_DEFAULTS_FILES_DIR@/remotetrx
+ PIDFile=${PIDFILE}
+ ExecStartPre=-/bin/touch ${LOGFILE}
+ ExecStartPre=-/bin/chown ${RUNASUSER} ${LOGFILE}
+diff --git a/src/svxlink/systemd/svxlink.service.in b/src/svxlink/systemd/svxlink.service.in
+index 576e6caab2bb..40dd971a0ec8 100644
+--- a/src/svxlink/systemd/svxlink.service.in
++++ b/src/svxlink/systemd/svxlink.service.in
+@@ -24,7 +24,7 @@ After=network.target remote-fs.target syslog.target time.target
+ After=svxlink_gpio_setup.service
+ 
+ [Service]
+-EnvironmentFile=@SYSTEMD_DEFAULTS_FILES_DIR@/svxlink
++EnvironmentFile=-@SYSTEMD_DEFAULTS_FILES_DIR@/svxlink
+ PIDFile=${PIDFILE}
+ ExecStartPre=-/bin/touch ${LOGFILE}
+ ExecStartPre=-/bin/chown ${RUNASUSER} ${LOGFILE}
+diff --git a/src/svxlink/systemd/svxreflector.service.in b/src/svxlink/systemd/svxreflector.service.in
+index f520efda82d5..30b0b3c68b82 100644
+--- a/src/svxlink/systemd/svxreflector.service.in
++++ b/src/svxlink/systemd/svxreflector.service.in
+@@ -22,7 +22,7 @@ Documentation=man:svxreflector(1)
+ After=network.target remote-fs.target syslog.target time.target
+ 
+ [Service]
+-EnvironmentFile=@SYSTEMD_DEFAULTS_FILES_DIR@/svxreflector
++EnvironmentFile=-@SYSTEMD_DEFAULTS_FILES_DIR@/svxreflector
+ PIDFile=${PIDFILE}
+ ExecStartPre=-/bin/touch ${LOGFILE}
+ ExecStartPre=-/bin/chown ${RUNASUSER} ${LOGFILE}
+-- 
+2.41.0
+
