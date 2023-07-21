@@ -5,9 +5,10 @@
 #
 Name     : svxlink
 Version  : 19.09.2
-Release  : 1
+Release  : 2
 URL      : https://github.com/sm0svx/svxlink/archive/19.09.2/svxlink-19.09.2.tar.gz
 Source0  : https://github.com/sm0svx/svxlink/archive/19.09.2/svxlink-19.09.2.tar.gz
+Source1  : https://github.com/sm0svx/svxlink-sounds-en_US-heather/releases/download/19.09/svxlink-sounds-en_US-heather-16k-19.09.tar.bz2
 Summary  : The SvxLink project files
 Group    : Development/Tools
 License  : GPL-2.0 ISC LGPL-2.1 MIT Zlib
@@ -79,6 +80,16 @@ Requires: svxlink = %{version}-%{release}
 dev components for the svxlink package.
 
 
+%package extras-server
+Summary: extras-server components for the svxlink package.
+Group: Default
+Requires: svxlink-bin = %{version}-%{release}
+Requires: svxlink-lib = %{version}-%{release}
+
+%description extras-server
+extras-server components for the svxlink package.
+
+
 %package lib
 Summary: lib components for the svxlink package.
 Group: Libraries
@@ -90,6 +101,10 @@ lib components for the svxlink package.
 
 %prep
 %setup -q -n svxlink-19.09.2
+cd %{_builddir}
+mkdir -p svxlink-sounds-en_US-heather-16k-19.09.tar
+cd svxlink-sounds-en_US-heather-16k-19.09.tar
+tar xf %{_sourcedir}/svxlink-sounds-en_US-heather-16k-19.09.tar.bz2
 cd %{_builddir}/svxlink-19.09.2
 
 %build
@@ -97,7 +112,7 @@ export http_proxy=http://127.0.0.1:9/
 export https_proxy=http://127.0.0.1:9/
 export no_proxy=localhost,127.0.0.1,0.0.0.0
 export LANG=C.UTF-8
-export SOURCE_DATE_EPOCH=1689893908
+export SOURCE_DATE_EPOCH=1689977391
 mkdir -p clr-build
 pushd clr-build
 export GCC_IGNORE_WERROR=1
@@ -108,30 +123,34 @@ export CFLAGS="$CFLAGS -O3 -fdebug-types-section -femit-struct-debug-baseonly -f
 export FCFLAGS="$FFLAGS -O3 -fdebug-types-section -femit-struct-debug-baseonly -ffat-lto-objects -flto=auto -g1 -gno-column-info -gno-variable-location-views -gz=zstd "
 export FFLAGS="$FFLAGS -O3 -fdebug-types-section -femit-struct-debug-baseonly -ffat-lto-objects -flto=auto -g1 -gno-column-info -gno-variable-location-views -gz=zstd "
 export CXXFLAGS="$CXXFLAGS -O3 -fdebug-types-section -femit-struct-debug-baseonly -ffat-lto-objects -flto=auto -g1 -gno-column-info -gno-variable-location-views -gz=zstd "
-%cmake ../src
+%cmake ../src -DWITH_SYSTEMD=YES \
+-DTCL_LIBRARY=$(readlink -f /usr/lib64/libtcl.so)
 make  %{?_smp_mflags}
 popd
 
 %install
-export SOURCE_DATE_EPOCH=1689893908
+export SOURCE_DATE_EPOCH=1689977391
 rm -rf %{buildroot}
 pushd clr-build
 %make_install
 popd
+## install_append content
+# Install sound files
+SOUNDDIR=%{buildroot}/usr/share/svxlink/sounds
+mkdir -p "${SOUNDDIR}"
+for lang in en_US; do
+sound=$(readlink -f ../svxlink-sounds-${lang}*/${lang}-*)
+mv "${sound}" "${SOUNDDIR}/"
+ln -s "$(basename ${sound})" "${SOUNDDIR}"/"${lang}"
+done
+## install_append end
 
 %files
 %defattr(-,root,root,-)
 
 %files bin
 %defattr(-,root,root,-)
-/usr/bin/devcal
 /usr/bin/qtel
-/usr/bin/remotetrx
-/usr/bin/siglevdetcal
-/usr/bin/svxlink
-/usr/bin/svxlink_gpio_down
-/usr/bin/svxlink_gpio_up
-/usr/bin/svxreflector
 
 %files data
 %defattr(-,root,root,-)
@@ -149,29 +168,6 @@ popd
 /usr/share/qtel/translations/qtel_sv.qm
 /usr/share/qtel/translations/qtel_tr.qm
 /usr/share/qtel/translations/qtel_uk.qm
-/usr/share/svxlink/events.d/CW.tcl
-/usr/share/svxlink/events.d/DtmfRepeater.tcl
-/usr/share/svxlink/events.d/EchoLink.tcl
-/usr/share/svxlink/events.d/Frn.tcl
-/usr/share/svxlink/events.d/Help.tcl
-/usr/share/svxlink/events.d/Logic.tcl
-/usr/share/svxlink/events.d/MetarInfo.tcl
-/usr/share/svxlink/events.d/Module.tcl
-/usr/share/svxlink/events.d/Parrot.tcl
-/usr/share/svxlink/events.d/PropagationMonitor.tcl
-/usr/share/svxlink/events.d/RepeaterLogic.tcl
-/usr/share/svxlink/events.d/SelCall.tcl
-/usr/share/svxlink/events.d/SelCallEnc.tcl
-/usr/share/svxlink/events.d/SimplexLogic.tcl
-/usr/share/svxlink/events.d/Tcl.tcl.example
-/usr/share/svxlink/events.d/TclVoiceMail.tcl
-/usr/share/svxlink/events.d/Trx.tcl
-/usr/share/svxlink/events.d/locale.tcl
-/usr/share/svxlink/events.tcl
-/usr/share/svxlink/modules.d/ModulePropagationMonitor.tcl
-/usr/share/svxlink/modules.d/ModuleSelCallEnc.tcl
-/usr/share/svxlink/modules.d/ModuleTcl.tcl.example
-/usr/share/svxlink/modules.d/ModuleTclVoiceMail.tcl
 
 %files dev
 %defattr(-,root,root,-)
@@ -242,6 +238,21 @@ popd
 /usr/lib64/libasyncqt.so
 /usr/lib64/libecholib.so
 
+%files extras-server
+%defattr(-,root,root,-)
+/lib/systemd/system/*
+/usr/bin/devcal
+/usr/bin/remotetrx
+/usr/bin/siglevdetcal
+/usr/bin/svxlink
+/usr/bin/svxlink_gpio_down
+/usr/bin/svxlink_gpio_up
+/usr/bin/svxreflector
+/usr/lib64/svxlink/*.so
+/usr/share/svxlink/*
+/usr/share/svxlink/*/*
+/usr/share/svxlink/*/*/*/*
+
 %files lib
 %defattr(-,root,root,-)
 /usr/lib64/libasyncaudio.so.1.6
@@ -254,11 +265,3 @@ popd
 /usr/lib64/libasyncqt.so.1.6.0
 /usr/lib64/libecholib.so.1.3
 /usr/lib64/libecholib.so.1.3.3
-/usr/lib64/svxlink/ModuleDtmfRepeater.so
-/usr/lib64/svxlink/ModuleEchoLink.so
-/usr/lib64/svxlink/ModuleFrn.so
-/usr/lib64/svxlink/ModuleHelp.so
-/usr/lib64/svxlink/ModuleMetarInfo.so
-/usr/lib64/svxlink/ModuleParrot.so
-/usr/lib64/svxlink/ModuleTcl.so
-/usr/lib64/svxlink/ModuleTrx.so

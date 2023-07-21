@@ -1,0 +1,8 @@
+# Install sound files
+SOUNDDIR=%{buildroot}/usr/share/svxlink/sounds
+mkdir -p "${SOUNDDIR}"
+for lang in en_US; do
+	sound=$(readlink -f ../svxlink-sounds-${lang}*/${lang}-*)
+	mv "${sound}" "${SOUNDDIR}/"
+	ln -s "$(basename ${sound})" "${SOUNDDIR}"/"${lang}"
+done

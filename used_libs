@@ -4,15 +4,10 @@ libQt5Network.so.5
 libQt5Widgets.so.5
 libasound.so.2
 libc.so.6
-libcurl.so.4
 libgcc_s.so.1
-libgcrypt.so.20
 libgsm.so.1
 libm.so.6
 libopus.so.0
-libpopt.so.0
-librtlsdr.so.0
 libsigc-2.0.so.0
 libspeex.so.1
 libstdc++.so.6
-libtcl.so

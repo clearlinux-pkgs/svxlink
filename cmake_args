@@ -1,0 +1,6 @@
+-DWITH_SYSTEMD=YES
+# cmake FindTCL will find libtcl.so before libtcl8.6.12.so which will
+# cause rpm to set a Requires for non-existent libtcl.so()(64bit), so
+# let's find what it actually points to.
+# See https://cmake.org/Bug/view.php?id=11033
+-DTCL_LIBRARY=$(readlink -f /usr/lib64/libtcl.so)

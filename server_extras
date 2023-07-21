@@ -1,0 +1,13 @@
+/lib/systemd/system/*
+/usr/bin/devcal
+/usr/bin/remotetrx
+/usr/bin/siglevdetcal
+/usr/bin/svxlink
+/usr/bin/svxlink_gpio_down
+/usr/bin/svxlink_gpio_up
+/usr/bin/svxreflector
+/usr/lib64/svxlink/*.so
+/usr/share/svxlink/*
+/usr/share/svxlink/*/*
+/usr/share/svxlink/*/*/*
+/usr/share/svxlink/*/*/*/*
